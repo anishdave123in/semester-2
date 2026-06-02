@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DOM Manipulation and Event Handling</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 10px;
+        }
+
+        #output {
+            font-size: 24px;
+            margin-top: 20px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>DOM Manipulation and Event Handling</h2>
+
+    <input type="text" id="nameInput" placeholder="Enter text">
+    <button onclick="changeText()">Change Text</button>
+    <button onclick="changeColor()">Change Color</button>
+
+    <div id="output">Welcome!</div>
+
+    <script>
+        function changeText() {
+            let text = document.getElementById("nameInput").value;
+            document.getElementById("output").innerHTML = text;
+        }
+
+        function changeColor() {
+            let colors = ["red", "green", "blue", "orange", "purple"];
+            let randomColor = colors[Math.floor(Math.random() * colors.length)];
+            document.getElementById("output").style.color = randomColor;
+        }
+    </script>
+
+</body>
+</html>
