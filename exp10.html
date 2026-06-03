@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bank Account Program</title>
+</head>
+<body>
+
+<h2>Output</h2>
+<pre id="output"></pre>
+
+<script>
+class BankAccount {
+    constructor(accountNumber, accountHolderName, balance) {
+        this.accountNumber = accountNumber;
+        this.accountHolderName = accountHolderName;
+        this.balance = balance;
+    }
+
+    deposit(amount) {
+        this.balance += amount;
+        output("Amount Deposited: " + amount);
+    }
+
+    displayDetails() {
+        output("Account Number: " + this.accountNumber);
+        output("Account Holder Name: " + this.accountHolderName);
+        output("Balance: " + this.balance);
+    }
+}
+
+class SavingsAccount extends BankAccount {
+    calculateInterest() {
+        let interest = this.balance * 0.05;
+        output("Savings Account Interest: " + interest);
+    }
+}
+
+class CurrentAccount extends BankAccount {
+    calculateInterest() {
+        let interest = this.balance * 0.02;
+        output("Current Account Interest: " + interest);
+    }
+}
+
+function output(text) {
+    document.getElementById("output").textContent += text + "\n";
+}
+
+let sa = new SavingsAccount(101, "Rahul", 10000);
+let ca = new CurrentAccount(102, "Anita", 20000);
+
+output("----- Savings Account -----");
+sa.deposit(2000);
+sa.displayDetails();
+sa.calculateInterest();
+
+output("");
+
+output("----- Current Account -----");
+ca.deposit(3000);
+ca.displayDetails();
+ca.calculateInterest();
+</script>
+
+</body>
+</html>
