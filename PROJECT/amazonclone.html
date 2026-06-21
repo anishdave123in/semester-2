@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bazaario — Shop everything</title>
+<style>
+:root{
+  --navy:#131921;
+  --navy-2:#232f3e;
+  --orange:#ff9900;
+  --orange-dark:#e88a00;
+  --link:#007185;
+  --price-red:#b12704;
+  --bg:#eaeded;
+  --card:#ffffff;
+  --border:#d5d9d9;
+  --text:#0f1111;
+  --muted:#565959;
+  --success:#067d62;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Amazon Ember",Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);}
+img{max-width:100%;display:block;}
+button{font-family:inherit;cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+input,select{font-family:inherit;}
+
+/* ===== TOP NAV ===== */
+.topnav{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap;}
+.logo{font-size:22px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:baseline;gap:2px;border:1px solid transparent;padding:6px 8px;border-radius:3px;}
+.logo:hover{border-color:#fff;}
+.logo span{color:var(--orange);}
+.deliver{display:flex;flex-direction:column;font-size:11px;padding:6px 8px;border-radius:3px;border:1px solid transparent;cursor:pointer;}
+.deliver:hover{border-color:#fff;}
+.deliver b{font-size:14px;}
+.search-bar{flex:1;display:flex;min-width:240px;height:40px;border-radius:4px;overflow:hidden;}
+.search-cat{background:#f3f3f3;color:#000;border:none;padding:0 8px;font-size:12px;border-right:1px solid #ccc;}
+.search-input{flex:1;border:none;padding:0 10px;font-size:15px;outline:none;}
+.search-btn{background:var(--orange);border:none;width:45px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.search-btn:hover{background:var(--orange-dark);}
+.suggest-box{position:absolute;top:42px;left:0;right:0;background:#fff;color:var(--text);border-radius:4px;box-shadow:0 4px 14px rgba(0,0,0,.25);overflow:hidden;z-index:70;display:none;}
+.suggest-box.show{display:block;}
+.suggest-item{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid #f2f2f2;}
+.suggest-item:last-child{border-bottom:none;}
+.suggest-item:hover{background:#f5f5f5;}
+.suggest-item .si-icon{font-size:20px;}
+.suggest-item .si-cat{color:var(--muted);font-size:12px;margin-left:auto;}
+.suggest-item mark{background:#fff2b8;padding:0 1px;}
+.nav-account, .nav-orders, .nav-cart{display:flex;flex-direction:column;font-size:12px;padding:6px 8px;border-radius:3px;border:1px solid transparent;white-space:nowrap;}
+.nav-account:hover, .nav-orders:hover, .nav-cart:hover{border-color:#fff;}
+.nav-account b, .nav-orders b{font-size:14px;}
+.nav-cart{flex-direction:row;align-items:flex-end;gap:4px;position:relative;font-weight:700;font-size:14px;}
+.cart-icon{font-size:26px;position:relative;}
+.cart-count{position:absolute;top:-6px;left:14px;background:var(--orange);color:#111;font-weight:800;font-size:13px;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;}
+.subnav{background:var(--navy-2);color:#fff;display:flex;gap:18px;padding:8px 16px;font-size:13px;overflow-x:auto;}
+.subnav a{padding:4px 6px;border:1px solid transparent;border-radius:3px;white-space:nowrap;}
+.subnav a:hover{border-color:#fff;}
+.subnav a.all{font-weight:700;display:flex;align-items:center;gap:4px;}
+
+/* ===== HERO ===== */
+.hero{background:linear-gradient(180deg,#dde3e8 0%,var(--bg) 100%);padding-bottom:0;}
+.hero-banner{height:280px;background:linear-gradient(120deg,#232f3e,#37475a 60%, #ff9900 140%);display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;overflow:hidden;}
+.hero-banner h1{font-size:36px;font-weight:800;}
+.hero-banner p{margin-top:8px;font-size:16px;opacity:.9;}
+.hero-shapes{position:absolute;inset:0;opacity:.15;background-image:radial-gradient(circle at 20% 30%, #fff 0, transparent 40%), radial-gradient(circle at 80% 70%, #fff 0, transparent 35%);}
+
+.hero-cards{max-width:1500px;margin:-110px auto 0;padding:0 18px 30px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative;z-index:2;}
+.hcard{background:var(--card);padding:18px;border-radius:4px;box-shadow:0 2px 5px rgba(0,0,0,.15);}
+.hcard h3{font-size:18px;margin-bottom:10px;}
+.hcard img{width:100%;height:140px;object-fit:cover;border-radius:2px;margin-bottom:10px;background:#f3f3f3;}
+.hcard a{color:var(--link);font-size:13px;font-weight:600;}
+.hcard a:hover{text-decoration:underline;color:var(--price-red);}
+
+/* ===== CONTROLS / FILTERS ===== */
+.shop-wrap{max-width:1500px;margin:0 auto;padding:0 18px 60px;display:grid;grid-template-columns:230px 1fr;gap:18px;}
+@media(max-width:900px){.shop-wrap{grid-template-columns:1fr;} .hero-cards{grid-template-columns:repeat(2,1fr);}}
+.filters{background:var(--card);border-radius:4px;padding:16px;height:fit-content;position:sticky;top:14px;}
+.filters h4{font-size:14px;margin:14px 0 8px;text-transform:uppercase;letter-spacing:.3px;}
+.filters h4:first-child{margin-top:0;}
+.filter-row{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:6px;cursor:pointer;color:var(--text);}
+.filter-row input{accent-color:var(--orange);}
+.price-inputs{display:flex;gap:6px;align-items:center;margin-top:6px;}
+.price-inputs input{width:70px;padding:5px;border:1px solid var(--border);border-radius:3px;font-size:13px;}
+.star-row{cursor:pointer;color:var(--link);font-size:13px;margin-bottom:4px;}
+.clear-filters{margin-top:14px;font-size:13px;color:var(--link);cursor:pointer;}
+.clear-filters:hover{text-decoration:underline;}
+
+.results-bar{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:12px 16px;border-radius:4px;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.results-bar select{padding:6px 8px;border:1px solid var(--border);border-radius:4px;}
+.results-count{font-size:14px;color:var(--muted);}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.product-card{background:var(--card);border-radius:6px;padding:14px;display:flex;flex-direction:column;position:relative;transition:box-shadow .15s;}
+.product-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.15);}
+.wish-btn{position:absolute;top:10px;right:10px;background:#fff;border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:2;}
+.wish-btn.active{color:#d40000;border-color:#d40000;}
+.product-img{height:170px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;cursor:pointer;background:#fafafa;border-radius:4px;overflow:hidden;}
+.product-img img{height:100%;object-fit:contain;}
+.product-title{font-size:14px;color:var(--text);cursor:pointer;flex-grow:0;line-height:1.3;max-height:38px;overflow:hidden;}
+.product-title:hover{color:var(--price-red);text-decoration:underline;}
+.stars{color:var(--orange);font-size:14px;margin:6px 0 2px;display:flex;align-items:center;gap:6px;}
+.stars small{color:var(--link);}
+.badge-row{display:flex;gap:6px;margin:4px 0;flex-wrap:wrap;}
+.badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;}
+.badge.choice{background:#a3d6f7;color:#003a5d;}
+.badge.deal{background:#cc0c39;color:#fff;}
+.badge.prime{color:#007185;font-weight:800;font-size:11px;}
+.price-row{display:flex;align-items:baseline;gap:6px;margin:6px 0 2px;}
+.price-row .symbol{font-size:12px;position:relative;top:-6px;}
+.price-row .whole{font-size:21px;font-weight:700;}
+.price-row .frac{font-size:12px;position:relative;top:-6px;}
+.price-old{font-size:12px;color:var(--muted);text-decoration:line-through;}
+.coupon{font-size:12px;background:#f0f7e8;color:var(--success);padding:2px 5px;display:inline-block;border:1px solid var(--success);border-radius:3px;margin:4px 0;width:fit-content;}
+.delivery-info{font-size:12px;color:var(--muted);margin:4px 0 10px;}
+.add-cart-btn{margin-top:auto;background:var(--orange);border:none;border-radius:20px;padding:8px 0;font-size:13px;font-weight:600;}
+.add-cart-btn:hover{background:var(--orange-dark);}
+.add-cart-btn.added{background:var(--success);color:#fff;}
+.stock-low{color:var(--price-red);font-size:12px;font-weight:700;margin-top:4px;}
+
+.no-results{grid-column:1/-1;text-align:center;padding:60px 20px;background:var(--card);border-radius:6px;color:var(--muted);}
+
+.load-more-wrap{display:flex;justify-content:center;margin-top:22px;}
+.load-more-btn{background:#fff;border:1px solid var(--border);padding:10px 26px;border-radius:20px;font-weight:600;font-size:14px;}
+.load-more-btn:hover{background:#f2f2f2;}
+
+.brand-scroll{max-height:160px;overflow-y:auto;padding-right:4px;}
+
+.compare-checkbox-row{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:8px;color:var(--muted);}
+.compare-checkbox-row input{accent-color:var(--navy-2);}
+.compare-bar{position:fixed;left:0;right:0;bottom:0;background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;z-index:55;transform:translateY(110%);transition:transform .25s;flex-wrap:wrap;}
+.compare-bar.show{transform:translateY(0);}
+.compare-chip{background:#2b3b4d;padding:6px 10px;border-radius:14px;font-size:12px;display:flex;align-items:center;gap:6px;}
+.compare-chip button{background:none;border:none;color:#fff;font-size:13px;}
+.compare-actions{margin-left:auto;display:flex;gap:10px;}
+.compare-go-btn{background:var(--orange);border:none;padding:8px 18px;border-radius:18px;font-weight:700;font-size:13px;}
+.compare-clear-btn{background:transparent;border:1px solid #6b7785;color:#fff;padding:8px 14px;border-radius:18px;font-size:13px;}
+
+.recently-section{max-width:1500px;margin:0 auto 24px;padding:0 18px;}
+.recently-section h3{font-size:16px;margin-bottom:10px;}
+.recently-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
+.recently-card{background:var(--card);border-radius:6px;padding:10px;min-width:140px;text-align:center;cursor:pointer;flex-shrink:0;}
+.recently-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.12);}
+.recently-card .ri{font-size:42px;}
+.recently-card .rt{font-size:12px;margin-top:6px;max-height:32px;overflow:hidden;}
+.recently-card .rp{font-size:13px;font-weight:700;color:var(--price-red);margin-top:4px;}
+
+.compare-table{width:100%;border-collapse:collapse;font-size:13px;}
+.compare-table th,.compare-table td{border:1px solid var(--border);padding:10px;text-align:left;vertical-align:top;}
+.compare-table th{background:#f7f8f8;width:130px;}
+.compare-table .ct-icon{font-size:40px;text-align:center;}
+.related-row{display:flex;gap:12px;overflow-x:auto;margin-top:6px;padding-bottom:4px;}
+.related-card{min-width:130px;background:#fafafa;border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center;cursor:pointer;flex-shrink:0;}
+.related-card:hover{background:#f0f0f0;}
+.related-card .ri{font-size:32px;}
+.related-card .rt{font-size:11px;margin-top:6px;max-height:28px;overflow:hidden;}
+.related-card .rp{font-size:12px;font-weight:700;color:var(--price-red);}
+
+/* ===== CART DRAWER ===== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;}
+.overlay.show{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;right:-420px;width:400px;max-width:92vw;height:100%;background:#fff;z-index:60;transition:right .3s;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.2);}
+.drawer.open{right:0;}
+.drawer-head{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.drawer-head h2{font-size:18px;}
+.drawer-close{background:none;border:none;font-size:22px;}
+.drawer-body{flex:1;overflow-y:auto;padding:14px;}
+.cart-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #f0f0f0;}
+.cart-item img{width:70px;height:70px;object-fit:contain;background:#fafafa;border-radius:4px;}
+.cart-item-info{flex:1;}
+.cart-item-info .title{font-size:13px;margin-bottom:6px;}
+.cart-item-info .price{font-weight:700;color:var(--price-red);font-size:14px;}
+.qty-controls{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.qty-controls button{width:24px;height:24px;border:1px solid var(--border);background:#f3f3f3;border-radius:4px;font-size:14px;}
+.remove-link{color:var(--link);font-size:12px;margin-top:6px;display:inline-block;}
+.remove-link:hover{text-decoration:underline;color:var(--price-red);}
+.drawer-foot{padding:16px;border-top:1px solid var(--border);}
+.subtotal-row{display:flex;justify-content:space-between;font-size:16px;margin-bottom:10px;}
+.subtotal-row b{color:var(--price-red);}
+.checkout-btn{width:100%;background:var(--orange);border:none;padding:10px;border-radius:20px;font-weight:700;font-size:14px;}
+.checkout-btn:hover{background:var(--orange-dark);}
+.empty-cart{text-align:center;padding:50px 10px;color:var(--muted);}
+
+/* ===== MODALS ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:80;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:8px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:12px;right:14px;background:#fff;border:1px solid var(--border);border-radius:50%;width:30px;height:30px;font-size:16px;z-index:2;}
+.pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:30px;}
+@media(max-width:700px){.pd-grid{grid-template-columns:1fr;}}
+.pd-img{display:flex;align-items:center;justify-content:center;background:#fafafa;border-radius:6px;height:340px;}
+.pd-img img{max-height:300px;object-fit:contain;}
+.pd-title{font-size:22px;margin-bottom:8px;}
+.pd-divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.pd-bullets{font-size:14px;line-height:1.7;margin:10px 0 16px;padding-left:18px;color:var(--text);}
+.pd-buybox{border:1px solid var(--border);border-radius:8px;padding:16px;}
+.pd-qty{display:flex;align-items:center;gap:8px;margin:14px 0;}
+.pd-qty select{padding:6px;border:1px solid var(--border);border-radius:4px;}
+.pd-actions button{width:100%;padding:10px;border-radius:20px;border:none;font-weight:600;font-size:14px;margin-bottom:8px;}
+.pd-add{background:var(--orange);}
+.pd-add:hover{background:var(--orange-dark);}
+.pd-buy{background:#fa8900;}
+.pd-buy:hover{background:#e57c00;}
+
+/* Auth modal */
+.auth-modal{max-width:380px;padding:26px;}
+.auth-modal h2{font-size:20px;margin-bottom:16px;}
+.auth-modal label{display:block;font-size:13px;font-weight:700;margin:12px 0 4px;}
+.auth-modal input{width:100%;padding:9px;border:1px solid #a6a6a6;border-radius:4px;font-size:14px;}
+.auth-submit{margin-top:18px;width:100%;background:var(--orange);border:none;padding:9px;border-radius:8px;font-weight:600;}
+.auth-submit:hover{background:var(--orange-dark);}
+.auth-switch{font-size:13px;margin-top:14px;color:var(--link);cursor:pointer;text-align:center;}
+.auth-switch:hover{text-decoration:underline;}
+
+/* Checkout modal */
+.checkout-modal{max-width:760px;padding:30px;}
+.co-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;}
+@media(max-width:650px){.co-grid{grid-template-columns:1fr;}}
+.co-section{border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:14px;}
+.co-section h3{font-size:15px;margin-bottom:10px;}
+.co-section input,.co-section select{width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;margin-bottom:8px;font-size:13px;}
+.pay-options label{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px;cursor:pointer;}
+.co-summary-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;}
+.co-total{font-weight:700;font-size:16px;border-top:1px solid var(--border);padding-top:8px;margin-top:8px;}
+.place-order-btn{width:100%;background:var(--orange);border:none;padding:12px;border-radius:20px;font-weight:700;margin-top:8px;}
+.place-order-btn:hover{background:var(--orange-dark);}
+.order-success{text-align:center;padding:30px 10px;}
+.order-success .check{font-size:54px;color:var(--success);margin-bottom:14px;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:#222;color:#fff;padding:12px 22px;border-radius:6px;font-size:14px;z-index:100;transition:transform .3s;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Footer */
+footer{background:var(--navy-2);color:#fff;margin-top:40px;}
+.footer-top{text-align:center;padding:16px;background:#37475a;cursor:pointer;font-size:13px;}
+.footer-top:hover{background:#3f5266;}
+.footer-cols{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:36px 20px;}
+.footer-cols h5{font-size:14px;margin-bottom:10px;}
+.footer-cols a{display:block;font-size:12px;color:#ddd;margin-bottom:8px;}
+.footer-cols a:hover{text-decoration:underline;}
+.footer-bottom{text-align:center;padding:18px;font-size:12px;color:#aaa;border-top:1px solid #3a4553;}
+@media(max-width:600px){.footer-cols{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="topnav">
+  <a class="logo" href="#" onclick="resetFilters();return false;">bazaario<span>.</span></a>
+  <div class="deliver">
+    <span>Deliver to</span>
+    <b id="deliverLoc">📍 New Delhi 110001</b>
+  </div>
+  <div class="search-bar" style="position:relative;">
+    <select class="search-cat" id="catSelect">
+      <option value="">All</option>
+    </select>
+    <input class="search-input" id="searchInput" type="text" placeholder="Search bazaario.in" autocomplete="off">
+    <button class="search-btn" onclick="runSearch()">🔍</button>
+    <div id="suggestBox" class="suggest-box"></div>
+  </div>
+  <div class="nav-account" onclick="openAuth('login')">
+    <span id="greetLine">Hello, sign in</span>
+    <b>Account &amp; Lists ▾</b>
+  </div>
+  <div class="nav-orders" onclick="showToast('Order history is empty — start shopping!')">
+    <span>Returns</span>
+    <b>&amp; Orders</b>
+  </div>
+  <div class="nav-cart" onclick="openCart()">
+    <span class="cart-icon">🛒<span class="cart-count" id="cartCount">0</span></span>
+    <span>Cart</span>
+  </div>
+</div>
+<div class="subnav">
+  <a class="all" href="#" onclick="toggleAllMenu();return false;">☰ All</a>
+  <a href="#" onclick="filterCategory('');return false;">Today's Deals</a>
+  <a href="#" onclick="filterCategory('Electronics');return false;">Electronics</a>
+  <a href="#" onclick="filterCategory('Fashion');return false;">Fashion</a>
+  <a href="#" onclick="filterCategory('Home');return false;">Home &amp; Kitchen</a>
+  <a href="#" onclick="filterCategory('Books');return false;">Books</a>
+  <a href="#" onclick="filterCategory('Sports');return false;">Sports</a>
+  <a href="#" onclick="filterCategory('Beauty');return false;">Beauty</a>
+  <a href="#" onclick="filterCategory('Toys');return false;">Toys</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-banner">
+    <div class="hero-shapes"></div>
+    <div>
+      <h1>Big savings, every day.</h1>
+      <p>Explore deals across Electronics, Fashion, Home &amp; more</p>
+    </div>
+  </div>
+  <div class="hero-cards" id="heroCards"></div>
+</div>
+
+<!-- ===== SHOP ===== -->
+<div class="shop-wrap">
+  <aside class="filters">
+    <h4>Department</h4>
+    <div id="catFilterList"></div>
+
+    <h4>Brand</h4>
+    <div class="brand-scroll" id="brandFilterList"></div>
+
+    <h4>Customer Reviews</h4>
+    <div id="starFilterList"></div>
+
+    <h4>Price</h4>
+    <div class="price-inputs">
+      <input type="number" id="minPrice" placeholder="Min">
+      <span>–</span>
+      <input type="number" id="maxPrice" placeholder="Max">
+    </div>
+    <div class="filter-row" style="margin-top:8px;">
+      <button onclick="applyPriceFilter()" style="background:#f0f2f2;border:1px solid var(--border);border-radius:14px;padding:5px 14px;font-size:13px;">Go</button>
+    </div>
+
+    <h4>Availability</h4>
+    <label class="filter-row"><input type="checkbox" id="inStockOnly" onchange="renderProducts()"> In Stock Only</label>
+
+    <h4>Other</h4>
+    <label class="filter-row"><input type="checkbox" id="primeOnly" onchange="renderProducts()"> Prime Eligible</label>
+    <label class="filter-row"><input type="checkbox" id="dealsOnly" onchange="renderProducts()"> Today's Deals</label>
+
+    <div class="clear-filters" onclick="resetFilters()">Clear all filters</div>
+  </aside>
+
+  <main>
+    <div class="results-bar">
+      <div class="results-count" id="resultsCount">Showing all results</div>
+      <div>
+        <label style="font-size:13px;margin-right:6px;">Sort by:</label>
+        <select id="sortSelect" onchange="renderProducts()">
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Avg. Customer Review</option>
+          <option value="newest">Newest Arrivals</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid" id="productGrid"></div>
+    <div class="load-more-wrap" id="loadMoreWrap"></div>
+  </main>
+</div>
+
+<div class="recently-section" id="recentlySection" style="display:none;">
+  <h3>Recently viewed</h3>
+  <div class="recently-strip" id="recentlyStrip"></div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲ Back to top</div>
+  <div class="footer-cols">
+    <div>
+      <h5>Get to Know Us</h5>
+      <a href="#">About bazaario</a><a href="#">Careers</a><a href="#">Press Releases</a><a href="#">Sustainability</a>
+    </div>
+    <div>
+      <h5>Connect with Us</h5>
+      <a href="#">Facebook</a><a href="#">Twitter</a><a href="#">Instagram</a>
+    </div>
+    <div>
+      <h5>Make Money with Us</h5>
+      <a href="#">Sell on bazaario</a><a href="#">Become an Affiliate</a><a href="#">Advertise Your Products</a>
+    </div>
+    <div>
+      <h5>Let Us Help You</h5>
+      <a href="#" onclick="showToast('Order history is empty');return false;">Your Orders</a>
+      <a href="#" onclick="showToast('No returns yet');return false;">Returns &amp; Replacements</a>
+      <a href="#">Help Center</a>
+    </div>
+  </div>
+  <div class="footer-bottom">Demo project inspired by e-commerce UX patterns — not affiliated with Amazon.com, Inc. Built for educational purposes.</div>
+</footer>
+
+<!-- ===== CART DRAWER ===== -->
+<div class="overlay" id="overlay" onclick="closeAllOverlays()"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h2>Your Cart</h2>
+    <button class="drawer-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</div>
+
+<!-- ===== PRODUCT MODAL ===== -->
+<div class="modal-overlay" id="pdModalOverlay">
+  <div class="modal" id="pdModal"></div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="modal-overlay" id="authModalOverlay">
+  <div class="modal auth-modal" id="authModal"></div>
+</div>
+
+<!-- ===== CHECKOUT MODAL ===== -->
+<div class="modal-overlay" id="checkoutModalOverlay">
+  <div class="modal checkout-modal" id="checkoutModal"></div>
+</div>
+
+<div class="compare-bar" id="compareBar"></div>
+
+<div class="modal-overlay" id="compareModalOverlay">
+  <div class="modal" id="compareModal" style="max-width:1000px;padding:24px;"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const PRODUCTS = [
+  {id:1,title:"Noiseless Mechanical Keyboard, RGB Backlit, Hot-swappable",brand:"Kelix",cat:"Electronics",price:3499,old:4999,rating:4.5,reviews:2310,prime:true,deal:true,choice:true,stock:14,img:"⌨️",desc:["Hot-swappable switches for custom feel","RGB backlighting with 16 effects","Durable PBT keycaps, double-shot molded","USB-C detachable cable"]},
+  {id:2,title:"Wireless Earbuds with Active Noise Cancellation",brand:"Sonix",cat:"Electronics",price:2199,old:3299,rating:4.3,reviews:8821,prime:true,deal:true,choice:false,stock:50,img:"🎧",desc:["Up to 30hrs total battery with case","Adaptive ANC + Transparency mode","IPX5 sweat and water resistant","Bluetooth 5.3 multipoint pairing"]},
+  {id:3,title:"4K Ultra HD Smart LED TV - 55 inch",brand:"Veltrix",cat:"Electronics",price:32999,old:45999,rating:4.6,reviews:1502,prime:true,deal:false,choice:true,stock:6,img:"📺",desc:["4K HDR10+ picture quality","Built-in voice assistant","3 HDMI + 2 USB ports","Frameless slim design"]},
+  {id:4,title:"Men's Slim Fit Cotton Casual Shirt",brand:"Urban Thread",cat:"Fashion",price:799,old:1499,rating:4.1,reviews:643,prime:true,deal:true,choice:false,stock:120,img:"👕",desc:["100% breathable cotton","Machine washable","Available in 6 colors","Regular fit, full sleeve"]},
+  {id:5,title:"Women's Running Shoes - Lightweight Mesh",brand:"Stridewell",cat:"Fashion",price:1899,old:2799,rating:4.4,reviews:3021,prime:true,deal:false,choice:true,stock:35,img:"👟",desc:["Breathable mesh upper","Cushioned EVA midsole","Anti-slip rubber outsole","Lightweight at 220g"]},
+  {id:6,title:"Stainless Steel Non-Stick Cookware Set (5 Pcs)",brand:"Homestead",cat:"Home",price:2599,old:3999,rating:4.5,reviews:1890,prime:true,deal:true,choice:false,stock:22,img:"🍳",desc:["Induction compatible base","PFOA-free non-stick coating","Includes tempered glass lids","Dishwasher safe"]},
+  {id:7,title:"Memory Foam Pillow - Orthopedic Cervical Support",brand:"Restwell",cat:"Home",price:899,old:1299,rating:4.2,reviews:954,prime:false,deal:false,choice:false,stock:60,img:"🛏️",desc:["Contoured cervical design","Cooling gel-infused foam","Removable washable cover","Reduces neck & shoulder pain"]},
+  {id:8,title:"The Silent Horizon — A Mystery Novel",brand:"Inkwell Press",cat:"Books",price:349,old:499,rating:4.7,reviews:5210,prime:true,deal:false,choice:true,stock:80,img:"📖",desc:["Bestselling mystery thriller","Paperback, 412 pages","Award-winning author","Includes reader's discussion guide"]},
+  {id:9,title:"Atomic Habits for Productivity — Self Help Guide",brand:"Inkwell Press",cat:"Books",price:299,old:450,rating:4.8,reviews:9120,prime:true,deal:true,choice:true,stock:200,img:"📚",desc:["Practical habit-building framework","Easy to read, actionable chapters","Paperback edition","Includes printable habit tracker"]},
+  {id:10,title:"Adjustable Dumbbell Set 20kg with Stand",brand:"IronCore",cat:"Sports",price:4499,old:6299,rating:4.3,reviews:712,prime:false,deal:false,choice:false,stock:9,img:"🏋️",desc:["Quick-adjust weight dial","Space-saving stand included","Rubber coated grip","Suitable for home gym"]},
+  {id:11,title:"Yoga Mat - Extra Thick Non-Slip 6mm",brand:"Zenflex",cat:"Sports",price:599,old:999,rating:4.4,reviews:2204,prime:true,deal:true,choice:false,stock:75,img:"🧘",desc:["6mm extra cushioning","Non-slip textured surface","Lightweight carry strap included","Eco-friendly TPE material"]},
+  {id:12,title:"Vitamin C Brightening Face Serum 30ml",brand:"Glowra",cat:"Beauty",price:649,old:899,rating:4.2,reviews:1633,prime:true,deal:false,choice:false,stock:40,img:"🧴",desc:["20% Vitamin C concentration","Reduces dark spots & dullness","Lightweight, fast-absorbing","Suitable for all skin types"]},
+  {id:13,title:"Professional Hair Dryer with Diffuser - 2200W",brand:"Glowra",cat:"Beauty",price:1299,old:1899,rating:4.0,reviews:521,prime:true,deal:false,choice:false,stock:18,img:"💇",desc:["2200W fast drying power","Ionic technology reduces frizz","3 heat + 2 speed settings","Includes diffuser & concentrator"]},
+  {id:14,title:"Building Blocks Creative Set - 500 Pieces",brand:"Funkido",cat:"Toys",price:1099,old:1599,rating:4.6,reviews:2890,prime:true,deal:true,choice:true,stock:55,img:"🧱",desc:["500 compatible building pieces","Boosts creativity & motor skills","Storage box included","Ages 6 and up"]},
+  {id:15,title:"Remote Control Stunt Car - Off Road",brand:"Funkido",cat:"Toys",price:1499,old:2199,rating:4.1,reviews:430,prime:false,deal:false,choice:false,stock:0,img:"🚗",desc:["360° stunt rotation","All-terrain tires","Rechargeable battery, 20min runtime","2.4GHz remote, 50m range"]},
+  {id:16,title:"Smartwatch with Heart Rate & SpO2 Monitor",brand:"Sonix",cat:"Electronics",price:1799,old:2999,rating:4.3,reviews:6601,prime:true,deal:true,choice:true,stock:48,img:"⌚",desc:["1.8\" HD touch display","Heart rate, SpO2 & sleep tracking","7-day battery life","100+ sports modes"]},
+  {id:17,title:"Portable Bluetooth Speaker - 360° Sound, Waterproof",brand:"Sonix",cat:"Electronics",price:1499,old:2199,rating:4.4,reviews:4410,prime:true,deal:true,choice:false,stock:62,img:"🔊",desc:["360° immersive sound","IPX7 fully waterproof","12-hour playtime","Pair two speakers for stereo"]},
+  {id:18,title:"27-inch QHD Gaming Monitor, 165Hz",brand:"Veltrix",cat:"Electronics",price:18999,old:24999,rating:4.6,reviews:980,prime:true,deal:false,choice:true,stock:11,img:"🖥️",desc:["165Hz refresh rate, 1ms response","QHD 2560x1440 IPS panel","FreeSync & G-Sync compatible","Height & tilt adjustable stand"]},
+  {id:19,title:"Laptop Backpack with USB Charging Port, 15.6\"",brand:"Kelix",cat:"Electronics",price:1199,old:1799,rating:4.3,reviews:3120,prime:true,deal:true,choice:false,stock:90,img:"🎒",desc:["Fits up to 15.6\" laptops","Built-in USB charging port","Anti-theft hidden zipper","Water-resistant fabric"]},
+  {id:20,title:"Mirrorless Digital Camera with 18-55mm Lens",brand:"Veltrix",cat:"Electronics",price:42999,old:54999,rating:4.7,reviews:540,prime:false,deal:false,choice:true,stock:4,img:"📷",desc:["24.1MP APS-C sensor","4K video recording","In-body image stabilization","Flip touchscreen LCD"]},
+  {id:21,title:"Women's Floral Maxi Summer Dress",brand:"Urban Thread",cat:"Fashion",price:1099,old:1799,rating:4.2,reviews:1210,prime:true,deal:true,choice:false,stock:54,img:"👗",desc:["Lightweight rayon fabric","Adjustable waist tie","Machine washable","Available in 5 prints"]},
+  {id:22,title:"Men's Genuine Leather Wallet, RFID Blocking",brand:"Craftsmen Co.",cat:"Fashion",price:649,old:999,rating:4.5,reviews:2870,prime:true,deal:false,choice:true,stock:140,img:"👛",desc:["Genuine top-grain leather","RFID blocking technology","8 card slots + 2 cash pockets","Slim, pocket-friendly design"]},
+  {id:23,title:"Polarized Aviator Sunglasses UV400",brand:"Craftsmen Co.",cat:"Fashion",price:549,old:899,rating:4.1,reviews:1660,prime:true,deal:true,choice:false,stock:80,img:"🕶️",desc:["100% UV400 protection","Polarized anti-glare lenses","Metal frame, spring hinges","Includes hard case & cloth"]},
+  {id:24,title:"Kids' Lightweight Velcro Sneakers",brand:"Stridewell",cat:"Fashion",price:699,old:1099,rating:4.3,reviews:480,prime:true,deal:false,choice:false,stock:65,img:"👟",desc:["Easy velcro strap closure","Breathable canvas upper","Flexible non-slip sole","Sizes for ages 3-10"]},
+  {id:25,title:"Robot Vacuum Cleaner with Mapping & App Control",brand:"Homestead",cat:"Home",price:8999,old:13999,rating:4.4,reviews:2050,prime:true,deal:true,choice:true,stock:16,img:"🤖",desc:["Smart room mapping technology","App & voice control","2700Pa strong suction","Auto-recharge & resume"]},
+  {id:26,title:"6-Slice Digital Air Fryer Oven",brand:"Homestead",cat:"Home",price:3299,old:4599,rating:4.5,reviews:3340,prime:true,deal:false,choice:false,stock:28,img:"🍟",desc:["6 litre large capacity","8 preset cooking programs","Oil-free healthy frying","Dishwasher-safe basket"]},
+  {id:27,title:"Egyptian Cotton Bedsheet Set, Queen Size",brand:"Restwell",cat:"Home",price:1599,old:2399,rating:4.3,reviews:1120,prime:true,deal:true,choice:false,stock:44,img:"🛌",desc:["100% Egyptian cotton, 400 TC","Includes 2 pillowcases","Fade & wrinkle resistant","Fits mattresses up to 16\""]},
+  {id:28,title:"LED Desk Lamp with Wireless Charger",brand:"Veltrix",cat:"Home",price:1399,old:1999,rating:4.2,reviews:760,prime:true,deal:false,choice:false,stock:38,img:"💡",desc:["Built-in 10W wireless charging pad","5 brightness & 3 color modes","Touch control, memory function","USB-C powered"]},
+  {id:29,title:"The Last Cartographer — Epic Fantasy Novel",brand:"Inkwell Press",cat:"Books",price:399,old:599,rating:4.6,reviews:3110,prime:true,deal:false,choice:false,stock:95,img:"🗺️",desc:["Book one of an epic trilogy","Hardcover collector's edition","512 pages","Includes fold-out map"]},
+  {id:30,title:"Kids' Illustrated Encyclopedia of Animals",brand:"Brightleaf Books",cat:"Books",price:599,old:849,rating:4.8,reviews:1450,prime:true,deal:true,choice:true,stock:70,img:"🦁",desc:["500+ full-color illustrations","Ages 6-12","Hardcover, durable binding","Fun facts & quizzes included"]},
+  {id:31,title:"Beginner's Guide to Personal Finance",brand:"Brightleaf Books",cat:"Books",price:329,old:499,rating:4.5,reviews:2230,prime:true,deal:false,choice:false,stock:110,img:"💰",desc:["Step-by-step budgeting guide","Investing basics explained simply","Paperback, 280 pages","Includes worksheets & templates"]},
+  {id:32,title:"Foldable Treadmill with Incline, Bluetooth Speakers",brand:"IronCore",cat:"Sports",price:24999,old:32999,rating:4.2,reviews:340,prime:false,deal:true,choice:false,stock:5,img:"🏃",desc:["3-level manual incline","Foldable space-saving design","Built-in Bluetooth speakers","Max user weight 120kg"]},
+  {id:33,title:"Resistance Bands Set with Door Anchor (5 Bands)",brand:"Zenflex",cat:"Sports",price:499,old:799,rating:4.4,reviews:1980,prime:true,deal:true,choice:false,stock:130,img:"🪢",desc:["5 resistance levels 10-50lbs","Includes door anchor & handles","Portable carry bag included","Latex, snap-resistant"]},
+  {id:34,title:"Insulated Stainless Steel Water Bottle, 1L",brand:"Zenflex",cat:"Sports",price:449,old:699,rating:4.6,reviews:5210,prime:true,deal:false,choice:true,stock:200,img:"🍶",desc:["24hr cold, 12hr hot retention","Leak-proof flip lid","BPA-free, double-wall vacuum","Fits standard cup holders"]},
+  {id:35,title:"Cricket Bat - English Willow, Full Size",brand:"IronCore",cat:"Sports",price:3999,old:5999,rating:4.3,reviews:290,prime:false,deal:false,choice:false,stock:12,img:"🏏",desc:["Grade 2 English willow","Lightweight, full-size profile","Pre-knocked, ready to use","Includes protective cover"]},
+  {id:36,title:"Matte Liquid Lipstick Set - 6 Shades",brand:"Glowra",cat:"Beauty",price:799,old:1199,rating:4.3,reviews:2640,prime:true,deal:true,choice:false,stock:88,img:"💄",desc:["6 long-lasting matte shades","Transfer-proof, smudge-proof","Lightweight non-drying formula","Cruelty-free & vegan"]},
+  {id:37,title:"Electric Facial Cleansing Brush, Waterproof",brand:"Glowra",cat:"Beauty",price:899,old:1399,rating:4.1,reviews:670,prime:true,deal:false,choice:false,stock:33,img:"🧖",desc:["Sonic vibration technology","3 speed settings","Fully waterproof for shower use","USB rechargeable"]},
+  {id:38,title:"Argan Oil Hair Mask, Deep Conditioning 500ml",brand:"Craftsmen Co.",cat:"Beauty",price:549,old:799,rating:4.5,reviews:1890,prime:true,deal:true,choice:true,stock:75,img:"🧴",desc:["Repairs dry, damaged hair","Cold-pressed argan oil formula","Sulfate & paraben free","Suitable for color-treated hair"]},
+  {id:39,title:"Wooden Educational Puzzle Set for Toddlers",brand:"Funkido",cat:"Toys",price:399,old:599,rating:4.7,reviews:1340,prime:true,deal:false,choice:true,stock:100,img:"🧩",desc:["Non-toxic water-based paint","Develops shape & color recognition","Chunky pieces, easy grip","Ages 2-5"]},
+  {id:40,title:"Interactive Robot Dog Toy with Sound & Motion",brand:"Funkido",cat:"Toys",price:1899,old:2799,rating:4.0,reviews:380,prime:true,deal:true,choice:false,stock:24,img:"🐶",desc:["Walks, barks & responds to touch","Dances to music mode","LED light-up eyes","Requires 3x AA batteries"]},
+  {id:41,title:"Board Game Night Bundle - 3 Classic Games",brand:"Brightleaf Books",cat:"Toys",price:1299,old:1899,rating:4.6,reviews:760,prime:false,deal:false,choice:false,stock:40,img:"🎲",desc:["Includes 3 family classic games","2-8 players per game","Great for game night & parties","Compact storage box"]},
+  {id:42,title:"USB-C Fast Charging Cable, 6ft Braided (3-Pack)",brand:"Kelix",cat:"Electronics",price:399,old:699,rating:4.5,reviews:7430,prime:true,deal:true,choice:true,stock:300,img:"🔌",desc:["Braided nylon, tangle-free","Supports fast charging up to 60W","6ft length, 3-pack","10,000+ bend lifespan tested"]}
+];
+
+const CATEGORIES = [...new Set(PRODUCTS.map(p=>p.cat))];
+const BRANDS = [...new Set(PRODUCTS.map(p=>p.brand))].sort();
+
+/* ============================================================
+   STATE  (in-memory only, no localStorage per artifact rules)
+   ============================================================ */
+let state = {
+  cart: {},          // id -> qty
+  wishlist: new Set(),
+  compare: [],        // array of product ids, max 4
+  recentlyViewed: [],  // array of product ids, most recent first
+  user: null,
+  activeCategory: "",
+  activeStar: 0,
+  minPrice: null,
+  maxPrice: null,
+  searchTerm: "",
+  visibleCount: 12
+};
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init(){
+  const sel = document.getElementById('catSelect');
+  CATEGORIES.forEach(c=>{
+    const o = document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o);
+  });
+
+  document.getElementById('catFilterList').innerHTML = CATEGORIES.map(c=>
+    `<label class="filter-row"><input type="checkbox" class="catbox" value="${c}" onchange="renderProducts()"> ${c}</label>`
+  ).join('');
+
+  document.getElementById('brandFilterList').innerHTML = BRANDS.map(b=>
+    `<label class="filter-row"><input type="checkbox" class="brandbox" value="${b}" onchange="renderProducts()"> ${b}</label>`
+  ).join('');
+
+  document.getElementById('starFilterList').innerHTML = [4,3,2,1].map(s=>
+    `<div class="star-row" onclick="setStarFilter(${s})">${'★'.repeat(s)}${'☆'.repeat(5-s)} &amp; Up</div>`
+  ).join('');
+
+  renderHero();
+  renderProducts();
+  updateCartUI();
+  renderRecentlyViewed();
+  renderCompareBar();
+
+  const searchEl = document.getElementById('searchInput');
+  searchEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ hideSuggestions(); runSearch(); } });
+  searchEl.addEventListener('input', onSearchInput);
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('.search-bar')) hideSuggestions();
+  });
+}
+
+function renderHero(){
+  const picks = [PRODUCTS[1], PRODUCTS[5], PRODUCTS[7], PRODUCTS[13]];
+  document.getElementById('heroCards').innerHTML = picks.map(p=>`
+    <div class="hcard">
+      <h3>${p.cat} picks</h3>
+      <div style="height:140px;display:flex;align-items:center;justify-content:center;background:#f3f3f3;border-radius:2px;margin-bottom:10px;font-size:64px;">${p.img}</div>
+      <a href="#" onclick="filterCategory('${p.cat}');return false;">Shop now</a>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   FILTERS / SEARCH
+   ============================================================ */
+function onSearchInput(){
+  const val = document.getElementById('searchInput').value.trim().toLowerCase();
+  const box = document.getElementById('suggestBox');
+  if(!val){ hideSuggestions(); return; }
+  const matches = PRODUCTS.filter(p=>p.title.toLowerCase().includes(val) || p.brand.toLowerCase().includes(val) || p.cat.toLowerCase().includes(val)).slice(0,7);
+  if(!matches.length){ hideSuggestions(); return; }
+  box.innerHTML = matches.map(p=>{
+    const re = new RegExp('(' + val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+    const highlighted = p.title.replace(re,'<mark>$1</mark>');
+    return `<div class="suggest-item" onclick="selectSuggestion(${p.id})"><span class="si-icon">${p.img}</span><span>${highlighted}</span><span class="si-cat">${p.cat}</span></div>`;
+  }).join('');
+  box.classList.add('show');
+}
+function hideSuggestions(){
+  document.getElementById('suggestBox').classList.remove('show');
+}
+function selectSuggestion(id){
+  hideSuggestions();
+  openProductModal(id);
+}
+
+function runSearch(){
+  state.searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+  const catVal = document.getElementById('catSelect').value;
+  if(catVal) state.activeCategory = catVal;
+  state.visibleCount = 12;
+  hideSuggestions();
+  renderProducts();
+}
+
+function filterCategory(cat){
+  state.activeCategory = cat;
+  state.visibleCount = 12;
+  document.querySelectorAll('.catbox').forEach(cb=>cb.checked = (cb.value===cat));
+  renderProducts();
+  window.scrollTo({top:document.querySelector('.shop-wrap').offsetTop-10,behavior:'smooth'});
+}
+
+function setStarFilter(s){
+  state.activeStar = (state.activeStar===s)?0:s;
+  state.visibleCount = 12;
+  renderProducts();
+}
+
+function applyPriceFilter(){
+  const min = document.getElementById('minPrice').value;
+  const max = document.getElementById('maxPrice').value;
+  state.minPrice = min?parseFloat(min):null;
+  state.maxPrice = max?parseFloat(max):null;
+  state.visibleCount = 12;
+  renderProducts();
+}
+
+function resetFilters(){
+  state.activeCategory=""; state.activeStar=0; state.minPrice=null; state.maxPrice=null; state.searchTerm=""; state.visibleCount=12;
+  document.getElementById('searchInput').value="";
+  document.getElementById('minPrice').value=""; document.getElementById('maxPrice').value="";
+  document.getElementById('catSelect').value="";
+  document.getElementById('inStockOnly').checked=false;
+  document.getElementById('primeOnly').checked=false;
+  document.getElementById('dealsOnly').checked=false;
+  document.querySelectorAll('.catbox').forEach(cb=>cb.checked=false);
+  document.querySelectorAll('.brandbox').forEach(cb=>cb.checked=false);
+  document.getElementById('sortSelect').value='featured';
+  hideSuggestions();
+  renderProducts();
+}
+
+function toggleAllMenu(){
+  showToast('Browse categories using the nav bar above 👆');
+}
+
+/* ============================================================
+   RENDER PRODUCTS
+   ============================================================ */
+function getCheckedCats(){
+  return [...document.querySelectorAll('.catbox:checked')].map(cb=>cb.value);
+}
+function getCheckedBrands(){
+  return [...document.querySelectorAll('.brandbox:checked')].map(cb=>cb.value);
+}
+
+function renderProducts(){
+  let list = [...PRODUCTS];
+  const checkedCats = getCheckedCats();
+  const checkedBrands = getCheckedBrands();
+
+  if(state.activeCategory) list = list.filter(p=>p.cat===state.activeCategory);
+  if(checkedCats.length) list = list.filter(p=>checkedCats.includes(p.cat));
+  if(checkedBrands.length) list = list.filter(p=>checkedBrands.includes(p.brand));
+  if(state.searchTerm) list = list.filter(p=>p.title.toLowerCase().includes(state.searchTerm) || p.cat.toLowerCase().includes(state.searchTerm) || p.brand.toLowerCase().includes(state.searchTerm));
+  if(state.activeStar) list = list.filter(p=>p.rating >= state.activeStar);
+  if(state.minPrice!=null) list = list.filter(p=>p.price >= state.minPrice);
+  if(state.maxPrice!=null) list = list.filter(p=>p.price <= state.maxPrice);
+  if(document.getElementById('inStockOnly').checked) list = list.filter(p=>p.stock>0);
+  if(document.getElementById('primeOnly').checked) list = list.filter(p=>p.prime);
+  if(document.getElementById('dealsOnly').checked) list = list.filter(p=>p.deal);
+
+  const sort = document.getElementById('sortSelect').value;
+  if(sort==='price-asc') list.sort((a,b)=>a.price-b.price);
+  else if(sort==='price-desc') list.sort((a,b)=>b.price-a.price);
+  else if(sort==='rating') list.sort((a,b)=>b.rating-a.rating);
+  else if(sort==='newest') list.sort((a,b)=>b.id-a.id);
+
+  document.getElementById('resultsCount').textContent = state.activeCategory || state.searchTerm
+    ? `${list.length} results ${state.searchTerm?('for "'+state.searchTerm+'"'):''} ${state.activeCategory?('in '+state.activeCategory):''}`
+    : `Showing all ${list.length} results`;
+
+  const grid = document.getElementById('productGrid');
+  const loadMoreWrap = document.getElementById('loadMoreWrap');
+  if(!list.length){
+    grid.innerHTML = `<div class="no-results"><h3>No products match your filters</h3><p style="margin-top:8px;">Try clearing some filters or searching a different term.</p></div>`;
+    loadMoreWrap.innerHTML = '';
+    return;
+  }
+
+  const visible = list.slice(0, state.visibleCount);
+  grid.innerHTML = visible.map(p=>productCardHTML(p)).join('');
+
+  if(list.length > state.visibleCount){
+    loadMoreWrap.innerHTML = `<button class="load-more-btn" onclick="loadMore()">Show more results (${list.length - state.visibleCount} left)</button>`;
+  } else {
+    loadMoreWrap.innerHTML = '';
+  }
+}
+
+function loadMore(){
+  state.visibleCount += 12;
+  renderProducts();
+}
+
+function productCardHTML(p){
+  const whole = Math.floor(p.price), frac = String(p.price.toFixed(2)).split('.')[1];
+  const inWish = state.wishlist.has(p.id);
+  const inCart = !!state.cart[p.id];
+  const discount = Math.round((1-p.price/p.old)*100);
+  return `
+  <div class="product-card">
+    <button class="wish-btn ${inWish?'active':''}" onclick="toggleWishlist(${p.id})" title="Add to wishlist">${inWish?'♥':'♡'}</button>
+    <div class="product-img" onclick="openProductModal(${p.id})" style="font-size:80px;">${p.img}</div>
+    <div class="badge-row">
+      ${p.choice?'<span class="badge choice">Top Rated Pick</span>':''}
+      ${p.deal?'<span class="badge deal">Deal -'+discount+'%</span>':''}
+    </div>
+    <div class="product-title" onclick="openProductModal(${p.id})">${p.title}</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px;">by ${p.brand}</div>
+    <div class="stars">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5-Math.round(p.rating))} <small>${p.reviews.toLocaleString()}</small></div>
+    <div class="price-row">
+      <span class="symbol">₹</span><span class="whole">${whole.toLocaleString()}</span><span class="frac">${frac}</span>
+      ${p.old?`<span class="price-old">₹${p.old.toLocaleString()}</span>`:''}
+    </div>
+    ${p.deal?'<span class="coupon">Clip coupon</span>':''}
+    <div class="delivery-info">${p.prime?'<span class="badge prime">✓ Free Prime Delivery</span><br>':''}Get it by ${deliveryDateString()}</div>
+    ${p.stock===0?'<div class="stock-low">Currently unavailable</div>':(p.stock<10?`<div class="stock-low">Only ${p.stock} left in stock</div>`:'')}
+    <button class="add-cart-btn ${inCart?'added':''}" onclick="addToCart(${p.id})" ${p.stock===0?'disabled style="opacity:.5;cursor:not-allowed;"':''}>
+      ${p.stock===0?'Out of Stock':(inCart?'✓ Added — Add Another':'Add to Cart')}
+    </button>
+    <label class="compare-checkbox-row"><input type="checkbox" ${state.compare.includes(p.id)?'checked':''} onchange="toggleCompare(${p.id})"> Add to compare</label>
+  </div>`;
+}
+
+function deliveryDateString(){
+  const d = new Date(); d.setDate(d.getDate()+ (2+Math.floor(Math.random()*3)));
+  return d.toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
+}
+
+function toggleWishlist(id){
+  if(state.wishlist.has(id)) state.wishlist.delete(id); else state.wishlist.add(id);
+  renderProducts();
+  showToast(state.wishlist.has(id)?'Added to your Wish List':'Removed from Wish List');
+}
+
+/* ============================================================
+   COMPARE
+   ============================================================ */
+function toggleCompare(id){
+  const idx = state.compare.indexOf(id);
+  if(idx>-1){ state.compare.splice(idx,1); }
+  else {
+    if(state.compare.length>=4){ showToast('You can compare up to 4 products at a time'); renderProducts(); return; }
+    state.compare.push(id);
+  }
+  renderCompareBar();
+  renderProducts();
+}
+function renderCompareBar(){
+  const bar = document.getElementById('compareBar');
+  if(!state.compare.length){ bar.classList.remove('show'); bar.innerHTML=''; return; }
+  const items = state.compare.map(id=>PRODUCTS.find(p=>p.id===id));
+  bar.innerHTML = `
+    ${items.map(p=>`<span class="compare-chip">${p.img} ${p.title.slice(0,22)}${p.title.length>22?'…':''} <button onclick="toggleCompare(${p.id})">✕</button></span>`).join('')}
+    <div class="compare-actions">
+      <button class="compare-clear-btn" onclick="clearCompare()">Clear all</button>
+      <button class="compare-go-btn" onclick="openCompareModal()" ${items.length<2?'disabled style="opacity:.5;"':''}>Compare (${items.length})</button>
+    </div>
+  `;
+  bar.classList.add('show');
+}
+function clearCompare(){
+  state.compare = [];
+  renderCompareBar();
+  renderProducts();
+}
+function openCompareModal(){
+  if(state.compare.length<2){ showToast('Add at least 2 products to compare'); return; }
+  const items = state.compare.map(id=>PRODUCTS.find(p=>p.id===id));
+  const rows = [
+    ['Image', p=>`<div class="ct-icon">${p.img}</div>`],
+    ['Title', p=>p.title],
+    ['Brand', p=>p.brand],
+    ['Price', p=>`₹${p.price.toLocaleString()}`],
+    ['Rating', p=>`${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5-Math.round(p.rating))} (${p.reviews.toLocaleString()})`],
+    ['Prime', p=>p.prime?'✓ Yes':'— No'],
+    ['Stock', p=>p.stock>0?`${p.stock} available`:'Out of stock'],
+    ['Highlights', p=>`<ul style="padding-left:16px;">${p.desc.map(d=>`<li>${d}</li>`).join('')}</ul>`],
+    ['', p=>`<button class="add-cart-btn" style="margin-top:0;" onclick="addToCart(${p.id});closeAllOverlays();">Add to Cart</button>`]
+  ];
+  document.getElementById('compareModal').innerHTML = `
+    <button class="modal-close" onclick="closeAllOverlays()">✕</button>
+    <h2 style="margin-bottom:14px;">Compare products</h2>
+    <div style="overflow-x:auto;">
+    <table class="compare-table">
+      ${rows.map(([label,fn])=>`<tr><th>${label}</th>${items.map(p=>`<td>${fn(p)}</td>`).join('')}</tr>`).join('')}
+    </table>
+    </div>
+  `;
+  document.getElementById('compareModalOverlay').classList.add('show');
+}
+
+/* ============================================================
+   RECENTLY VIEWED
+   ============================================================ */
+function addToRecentlyViewed(id){
+  state.recentlyViewed = state.recentlyViewed.filter(x=>x!==id);
+  state.recentlyViewed.unshift(id);
+  state.recentlyViewed = state.recentlyViewed.slice(0,8);
+  renderRecentlyViewed();
+}
+function renderRecentlyViewed(){
+  const section = document.getElementById('recentlySection');
+  const strip = document.getElementById('recentlyStrip');
+  if(!state.recentlyViewed.length){ section.style.display='none'; return; }
+  section.style.display='block';
+  strip.innerHTML = state.recentlyViewed.map(id=>{
+    const p = PRODUCTS.find(x=>x.id===id);
+    return `<div class="recently-card" onclick="openProductModal(${p.id})">
+      <div class="ri">${p.img}</div>
+      <div class="rt">${p.title.slice(0,40)}${p.title.length>40?'…':''}</div>
+      <div class="rp">₹${p.price.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   CART
+   ============================================================ */
+function addToCart(id){
+  state.cart[id] = (state.cart[id]||0)+1;
+  updateCartUI();
+  renderProducts();
+  showToast('Added to cart ✓');
+}
+function changeQty(id, delta){
+  if(!state.cart[id]) return;
+  state.cart[id]+=delta;
+  if(state.cart[id]<=0) delete state.cart[id];
+  updateCartUI();
+  renderProducts();
+}
+function removeFromCart(id){
+  delete state.cart[id];
+  updateCartUI();
+  renderProducts();
+}
+function cartItemsArray(){
+  return Object.entries(state.cart).map(([id,qty])=>({...PRODUCTS.find(p=>p.id==id), qty}));
+}
+function cartSubtotal(){
+  return cartItemsArray().reduce((s,p)=>s+p.price*p.qty,0);
+}
+function cartCount(){
+  return Object.values(state.cart).reduce((a,b)=>a+b,0);
+}
+function updateCartUI(){
+  document.getElementById('cartCount').textContent = cartCount();
+  const items = cartItemsArray();
+  const body = document.getElementById('cartBody');
+  const foot = document.getElementById('cartFoot');
+  if(!items.length){
+    body.innerHTML = `<div class="empty-cart"><h3>Your cart is empty</h3><p style="margin-top:8px;font-size:13px;">Looks like you haven't added anything yet.</p></div>`;
+    foot.innerHTML = '';
+    return;
+  }
+  body.innerHTML = items.map(p=>`
+    <div class="cart-item">
+      <img src="" alt="" style="display:flex;align-items:center;justify-content:center;font-size:34px;">${p.img}
+      <div class="cart-item-info">
+        <div class="title">${p.title}</div>
+        <div class="price">₹${(p.price*p.qty).toLocaleString()}</div>
+        <div class="qty-controls">
+          <button onclick="changeQty(${p.id},-1)">−</button>
+          <span>${p.qty}</span>
+          <button onclick="changeQty(${p.id},1)">+</button>
+        </div>
+        <span class="remove-link" onclick="removeFromCart(${p.id})">Delete</span>
+      </div>
+    </div>
+  `).join('');
+  // fix the broken img tag rendering by using emoji-only cart icons
+  body.innerHTML = items.map(p=>`
+    <div class="cart-item">
+      <div style="width:70px;height:70px;background:#fafafa;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:34px;">${p.img}</div>
+      <div class="cart-item-info">
+        <div class="title">${p.title}</div>
+        <div class="price">₹${(p.price*p.qty).toLocaleString()}</div>
+        <div class="qty-controls">
+          <button onclick="changeQty(${p.id},-1)">−</button>
+          <span>${p.qty}</span>
+          <button onclick="changeQty(${p.id},1)">+</button>
+        </div>
+        <span class="remove-link" onclick="removeFromCart(${p.id})">Delete</span>
+      </div>
+    </div>
+  `).join('');
+  const subtotal = cartSubtotal();
+  foot.innerHTML = `
+    <div class="subtotal-row">Subtotal (${cartCount()} items): <b>₹${subtotal.toLocaleString()}</b></div>
+    <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout</button>
+  `;
+}
+
+function openCart(){ document.getElementById('cartDrawer').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+/* ============================================================
+   PRODUCT MODAL
+   ============================================================ */
+function openProductModal(id){
+  const p = PRODUCTS.find(p=>p.id===id);
+  addToRecentlyViewed(id);
+  const whole = Math.floor(p.price), frac = String(p.price.toFixed(2)).split('.')[1];
+  const related = PRODUCTS.filter(x=>x.cat===p.cat && x.id!==p.id).sort(()=>Math.random()-0.5).slice(0,6);
+  document.getElementById('pdModal').innerHTML = `
+    <button class="modal-close" onclick="closeAllOverlays()">✕</button>
+    <div class="pd-grid">
+      <div class="pd-img" style="font-size:140px;">${p.img}</div>
+      <div>
+        <div class="pd-title">${p.title}</div>
+        <div style="font-size:13px;color:var(--link);margin-bottom:4px;">Visit the ${p.brand} Store</div>
+        <div class="stars">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5-Math.round(p.rating))} <small>${p.reviews.toLocaleString()} ratings</small></div>
+        <hr class="pd-divider">
+        <div class="price-row"><span class="symbol">₹</span><span class="whole">${whole.toLocaleString()}</span><span class="frac">${frac}</span></div>
+        ${p.old?`<div class="price-old">M.R.P.: ₹${p.old.toLocaleString()}</div>`:''}
+        ${p.prime?'<div class="badge prime" style="margin-top:6px;">✓ Free Prime Delivery</div>':''}
+        <ul class="pd-bullets">${p.desc.map(d=>`<li>${d}</li>`).join('')}</ul>
+        <hr class="pd-divider">
+        <div class="pd-buybox">
+          <div style="font-size:13px;color:${p.stock>0?'var(--success)':'var(--price-red)'};font-weight:700;">${p.stock>0?'In Stock':'Out of Stock'}</div>
+          ${p.stock>0?`<div class="pd-qty"><label>Qty:</label>
+          <select id="pdQty">${Array.from({length:Math.min(p.stock,10)},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}</select></div>`:''}
+          <div class="pd-actions">
+            <button class="pd-add" onclick="addToCartFromModal(${p.id})" ${p.stock===0?'disabled style="opacity:.5;"':''}>Add to Cart</button>
+            <button class="pd-buy" onclick="buyNow(${p.id})" ${p.stock===0?'disabled style="opacity:.5;"':''}>Buy Now</button>
+            <button onclick="toggleWishlist(${p.id});closeAllOverlays();" style="background:#f0f2f2;border:1px solid var(--border);">${state.wishlist.has(p.id)?'♥ Remove from Wish List':'♡ Add to Wish List'}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${related.length?`
+    <div style="padding:0 30px 30px;">
+      <h3 style="font-size:16px;margin-bottom:10px;">Customers who viewed this also viewed</h3>
+      <div class="related-row">
+        ${related.map(r=>`<div class="related-card" onclick="openProductModal(${r.id})">
+          <div class="ri">${r.img}</div>
+          <div class="rt">${r.title.slice(0,38)}${r.title.length>38?'…':''}</div>
+          <div class="rp">₹${r.price.toLocaleString()}</div>
+        </div>`).join('')}
+      </div>
+    </div>`:''}
+  `;
+  document.getElementById('pdModalOverlay').classList.add('show');
+}
+function addToCartFromModal(id){
+  const qty = parseInt(document.getElementById('pdQty')?.value || 1);
+  state.cart[id] = (state.cart[id]||0)+qty;
+  updateCartUI();
+  renderProducts();
+  closeAllOverlays();
+  showToast('Added to cart ✓');
+}
+function buyNow(id){
+  state.cart[id] = state.cart[id] || 1;
+  updateCartUI();
+  closeAllOverlays();
+  openCheckout();
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+function openAuth(mode){
+  if(state.user){
+    document.getElementById('authModal').innerHTML = `
+      <button class="modal-close" onclick="closeAllOverlays()">✕</button>
+      <h2>Hello, ${state.user}</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Manage your account</p>
+      <button class="auth-submit" onclick="signOut()">Sign Out</button>
+    `;
+    document.getElementById('authModalOverlay').classList.add('show');
+    return;
+  }
+  renderAuthForm(mode);
+  document.getElementById('authModalOverlay').classList.add('show');
+}
+function renderAuthForm(mode){
+  const isLogin = mode==='login';
+  document.getElementById('authModal').innerHTML = `
+    <button class="modal-close" onclick="closeAllOverlays()">✕</button>
+    <h2>${isLogin?'Sign in':'Create account'}</h2>
+    ${!isLogin?`<label>Your name</label><input id="authName" type="text" placeholder="First and last name">`:''}
+    <label>Email or mobile number</label>
+    <input id="authEmail" type="text" placeholder="Enter email">
+    <label>Password</label>
+    <input id="authPass" type="password" placeholder="Enter password">
+    <button class="auth-submit" onclick="submitAuth(${isLogin})">${isLogin?'Sign In':'Create your account'}</button>
+    <div class="auth-switch" onclick="renderAuthForm('${isLogin?'register':'login'}')">${isLogin?"New to bazaario? Create an account":"Already have an account? Sign in"}</div>
+  `;
+}
+function submitAuth(isLogin){
+  const email = document.getElementById('authEmail').value.trim();
+  const name = isLogin ? email.split('@')[0] || 'there' : (document.getElementById('authName').value.trim()||'there');
+  if(!email){ showToast('Please enter an email to continue'); return; }
+  state.user = name;
+  document.getElementById('greetLine').textContent = 'Hello, '+name;
+  closeAllOverlays();
+  showToast(isLogin?'Signed in successfully':'Account created — welcome!');
+}
+function signOut(){
+  state.user=null;
+  document.getElementById('greetLine').textContent='Hello, sign in';
+  closeAllOverlays();
+  showToast('Signed out');
+}
+
+/* ============================================================
+   CHECKOUT
+   ============================================================ */
+function openCheckout(){
+  if(!cartCount()){ showToast('Your cart is empty'); return; }
+  closeCart();
+  const items = cartItemsArray();
+  const subtotal = cartSubtotal();
+  const shipping = subtotal>999?0:79;
+  const tax = Math.round(subtotal*0.18);
+  const total = subtotal+shipping+tax;
+  document.getElementById('checkoutModal').innerHTML = `
+    <button class="modal-close" onclick="closeAllOverlays()">✕</button>
+    <h2 style="margin-bottom:16px;">Checkout</h2>
+    <div class="co-grid">
+      <div>
+        <div class="co-section">
+          <h3>Shipping Address</h3>
+          <input placeholder="Full name" value="${state.user||''}">
+          <input placeholder="Address line 1">
+          <input placeholder="City">
+          <div style="display:flex;gap:8px;">
+            <input placeholder="State" style="flex:1;">
+            <input placeholder="PIN code" style="flex:1;">
+          </div>
+        </div>
+        <div class="co-section">
+          <h3>Payment Method</h3>
+          <div class="pay-options">
+            <label><input type="radio" name="pay" checked> Credit / Debit Card</label>
+            <label><input type="radio" name="pay"> UPI</label>
+            <label><input type="radio" name="pay"> Net Banking</label>
+            <label><input type="radio" name="pay"> Cash on Delivery</label>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="co-section">
+          <h3>Order Summary</h3>
+          ${items.map(p=>`<div class="co-summary-row"><span>${p.title.slice(0,28)}${p.title.length>28?'…':''} ×${p.qty}</span><span>₹${(p.price*p.qty).toLocaleString()}</span></div>`).join('')}
+          <hr class="pd-divider">
+          <div class="co-summary-row"><span>Items:</span><span>₹${subtotal.toLocaleString()}</span></div>
+          <div class="co-summary-row"><span>Shipping:</span><span>${shipping===0?'FREE':'₹'+shipping}</span></div>
+          <div class="co-summary-row"><span>Tax (18% GST):</span><span>₹${tax.toLocaleString()}</span></div>
+          <div class="co-summary-row co-total"><span>Order Total:</span><span>₹${total.toLocaleString()}</span></div>
+          <button class="place-order-btn" onclick="placeOrder()">Place Your Order</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('checkoutModalOverlay').classList.add('show');
+}
+function placeOrder(){
+  const orderId = 'BZ-'+Math.floor(100000+Math.random()*900000);
+  document.getElementById('checkoutModal').innerHTML = `
+    <button class="modal-close" onclick="closeAllOverlays()">✕</button>
+    <div class="order-success">
+      <div class="check">✅</div>
+      <h2>Order placed, thank you!</h2>
+      <p style="color:var(--muted);margin-top:8px;">Confirmation email sent. Order ID: <b>${orderId}</b></p>
+      <p style="color:var(--muted);margin-top:4px;">Estimated delivery: ${deliveryDateString()}</p>
+      <button class="auth-submit" style="margin-top:20px;max-width:220px;" onclick="finishOrder()">Continue Shopping</button>
+    </div>
+  `;
+  state.cart = {};
+  updateCartUI();
+  renderProducts();
+}
+function finishOrder(){ closeAllOverlays(); }
+
+/* ============================================================
+   UTIL
+   ============================================================ */
+function closeAllOverlays(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('pdModalOverlay').classList.remove('show');
+  document.getElementById('authModalOverlay').classList.remove('show');
+  document.getElementById('checkoutModalOverlay').classList.remove('show');
+  document.getElementById('compareModalOverlay').classList.remove('show');
+}
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+init();
+</script>
+</body>
+</html>
